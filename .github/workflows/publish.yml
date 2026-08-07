@@ -38,10 +38,13 @@ jobs:
       - name: Publish SDK
         run: npm publish
 
-      - name: Update MCP package version
-        working-directory: mcp
-        run: npm version ${{ steps.sdk-version.outputs.VERSION }} --no-git-tag-version
+      - name: Sync MCP package version
+        run: |
+          VERSION=${{ steps.sdk-version.outputs.VERSION }}
+          cd mcp
+          npm pkg set version=$VERSION
 
       - name: Publish MCP package
-        working-directory: mcp
-        run: npm publish
+        run: |
+          cd mcp
+          npm publish
