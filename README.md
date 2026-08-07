@@ -33,10 +33,10 @@ const history = await client.products.priceHistory(704874, { range: 'quarter' })
 
 | Resource | Methods |
 |----------|---------|
-| `client.products` | `details()`, `listings()`, `sales()`, `priceHistory()`, `volatility()`, `buylistPrice()`, `infinite()` |
+| `client.products` | `details()`, `listings()`, `sales()`, `priceHistory()`, `volatility()`, `buylistPrice()`, `infinite()`, `recommendations()` |
 | `client.search` | `autocomplete()`, `fullSearch()`, `bestsellers()`, `trending()` |
 | `client.pricing` | `skuMarketPrices()` |
-| `client.catalog` | `productLines()`, `categoryFilters()`, `latestSets()`, `setName()`, `catalogGroups()`, `verticals()` |
+| `client.catalog` | `productLines()`, `categoryFilters()`, `latestSets()`, `setName()`, `catalogGroups()`, `verticals()`, `countryCodes()` |
 | `client.content` | `articles()`, `trendingArticles()`, `tags()`, `kickbacks()`, `normalizeCardName()` |
 
 ### SDK Example: Card Analysis
@@ -157,6 +157,12 @@ The MCP server enables Claude Code to interact with TCGplayer data directly.
 
 ### Installation
 
+The MCP package is published separately:
+
+```bash
+npm install @deansasek/tcgplayer-api-mcp
+```
+
 Claude Code automatically detects `.mcp.json`:
 
 ```json
@@ -164,7 +170,7 @@ Claude Code automatically detects `.mcp.json`:
   "mcpServers": {
     "tcgplayer-api-mcp": {
       "command": "npx",
-      "args": ["tsx", "mcp/server.ts"]
+      "args": ["@deansasek/tcgplayer-api-mcp"]
     }
   }
 }
