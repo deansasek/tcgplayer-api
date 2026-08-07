@@ -134,4 +134,14 @@ export class ProductsResource {
     const url = `${BASE_URLS['infinite-api']}/product/${productId}`;
     return request<InfiniteProduct>(url);
   }
+
+  async recommendations(productIds: number[], options: { limit?: number } = {}): Promise<unknown> {
+    if (!Array.isArray(productIds) || productIds.length === 0) {
+      throw new ValidationError('productIds', 'must be a non-empty array');
+    }
+
+    const { limit = 10 } = options;
+    const url = `${BASE_URLS.mpgateway}/v1/recommendation/faceted`;
+    return postRequest(url, { productIds, limit });
+  }
 }

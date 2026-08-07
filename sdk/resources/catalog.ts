@@ -10,6 +10,7 @@ import {
   SetNameResult,
   CatalogGroup,
   Vertical,
+  CountryCode,
 } from '../types.js';
 import { BASE_URLS, DEFAULT_HEADERS, DEFAULT_MPFEV } from '../constants.js';
 
@@ -70,5 +71,10 @@ export class CatalogResource {
   async verticals(): Promise<Vertical[]> {
     const url = `${BASE_URLS['infinite-api']}/c/verticals/`;
     return request<Vertical[]>(url);
+  }
+
+  async countryCodes(): Promise<CountryCode[]> {
+    const url = `${BASE_URLS.mpapi}/v2/address/countryCodes`;
+    return request<CountryCode[]>(url);
   }
 }
