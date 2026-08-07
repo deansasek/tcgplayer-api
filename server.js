@@ -1,22 +1,31 @@
 /**
  * TCGplayer REST API Wrapper
  *
- * Discovered Endpoints:
- * - Autocomplete:         https://data.tcgplayer.com/autocomplete
- * - Product Search:       https://mp-search-api.tcgplayer.com/v1/search/request
- * - Product Details:      https://mp-search-api.tcgplayer.com/v2/product/{id}/details
- * - Latest Sales:         https://mpapi.tcgplayer.com/v2/product/{id}/latestsales
- * - Price History:        https://infinite-api.tcgplayer.com/price/history/{id}/detailed
- * - Market Price (SKU):   https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/{skuId}/volatility
- * - Buylist:             https://mpgateway.tcgplayer.com/v1/pricepoints/buylist/marketprice/products/{id}
- * - SKU Market Price:     https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/search
- * - Recommendations:      https://mp-search-api.tcgplayer.com/v1/recommendation/faceted
- * - Product Lines:        https://mp-search-api.tcgplayer.com/v1/search/productLines
- * - Catalog Groups:       https://mp-search-api.tcgplayer.com/v2/Catalog/CatalogGroups
- * - Category Filters:     https://mp-search-api.tcgplayer.com/v1/product/categoryfilters
- * - Latest Sets:          https://mp-search-api.tcgplayer.com/v1/product/latestsets/{ids}
- * - Free Shipping:        https://mp-search-api.tcgplayer.com/v2/param/freeshippingthreshold
+ * Base URLs:
+ * - data.tcgplayer.com      - Autocomplete
+ * - mpapi.tcgplayer.com     - Sales data
+ * - mp-search-api.tcgplayer.com - Search, product details, categories
+ * - infinite-api.tcgplayer.com - Price history
+ * - mpgateway.tcgplayer.com - Pricing data
  */
+
+/**
+ * Condition filter values for getLatestSales
+ */
+export const CONDITIONS = {
+  Unopened: 1,
+  Damaged: 2,
+  HeavilyPlayed: 3,
+  ModeratelyPlayed: 4,
+  LightlyPlayed: 5,
+  NearMint: 6,
+  Mint: 7,
+};
+
+/**
+ * Price range options for getPriceHistory
+ */
+export const PRICE_RANGES = ['week', 'month', 'quarter', 'year'];
 
 const BASE_URLS = {
   data: 'https://data.tcgplayer.com',
