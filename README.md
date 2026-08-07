@@ -49,6 +49,32 @@ const results = await autocomplete('charizard', { productLine: 'Pokemon' });
 
 **Returns:** Array of product suggestions with `product-name`, `product-id`, `set-name`, `rarityName`, `marketPrice`.
 
+### search(options)
+
+Full search with filters, sorting, and pagination.
+
+```javascript
+const results = await search({
+  q: 'charizard',
+  productLine: 'Pokemon',
+  from: 0,
+  size: 24,
+  sort: { field: 'marketPrice', direction: 'asc' }
+});
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `q` | string | `''` | Search query |
+| `productLine` | string | `'Pokemon'` | Product line name |
+| `from` | integer | `0` | Offset for pagination |
+| `size` | integer | `24` | Number of results |
+| `sort` | object | `{}` | Sort field and direction |
+
+**Returns:** `{ results: [{ totalResults, aggregations, results: [...] }] }`
+
+The `aggregations` object contains filter options: `cardType`, `energyType`, `rarityName`, `setName`, `condition`, `language`, `printing`.
+
 ### getProductDetails(productId, mpfev?)
 
 Get full product information.
@@ -141,11 +167,17 @@ autocomplete('gundam', { productLine: 'Gundam Card Game' });
 | Function | Endpoint | Method |
 |----------|----------|--------|
 | `autocomplete` | `https://data.tcgplayer.com/autocomplete` | GET |
+| `search` | `https://mp-search-api.tcgplayer.com/v1/search/request` | POST |
 | `getProductDetails` | `https://mp-search-api.tcgplayer.com/v2/product/{id}/details` | GET |
 | `getLatestSales` | `https://mpapi.tcgplayer.com/v2/product/{id}/latestsales` | POST |
 | `getPriceHistory` | `https://infinite-api.tcgplayer.com/price/history/{id}/detailed` | GET |
 | `getVolatility` | `https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/{skuId}/volatility` | GET |
 | `getBuylistPrice` | `https://mpgateway.tcgplayer.com/v1/pricepoints/buylist/marketprice/products/{id}` | GET |
+| `getSkuMarketPrices` | `https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/search` | POST |
+| `getProductLines` | `https://mp-search-api.tcgplayer.com/v1/search/productLines` | GET |
+| `getProductLineMappings` | `https://mp-search-api.tcgplayer.com/v1/search/productLineMappings` | GET |
+| `getCategoryFilters` | `https://mp-search-api.tcgplayer.com/v1/product/categoryfilters` | GET |
+| `getLatestSets` | `https://mp-search-api.tcgplayer.com/v1/product/latestsets/{ids}` | GET |
 
 ## Examples
 
