@@ -13,6 +13,12 @@ import {
 } from '../types.js';
 import { BASE_URLS, DEFAULT_HEADERS, DEFAULT_MPFEV } from '../constants.js';
 
+function assertPositiveNumber(value: unknown, name: string): void {
+  if (typeof value !== 'number' || value <= 0) {
+    throw new ValidationError(name, 'must be a positive number');
+  }
+}
+
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, {
     ...options,
@@ -64,11 +70,5 @@ export class CatalogResource {
   async verticals(): Promise<Vertical[]> {
     const url = `${BASE_URLS['infinite-api']}/c/verticals/`;
     return request<Vertical[]>(url);
-  }
-}
-
-function assertPositiveNumber(value: unknown, name: string): void {
-  if (typeof value !== 'number' || value <= 0) {
-    throw new ValidationError(name, 'must be a positive number');
   }
 }

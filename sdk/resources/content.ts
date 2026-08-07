@@ -2,7 +2,7 @@
  * Content Resource
  */
 
-import { TCGplayerError } from '../errors.js';
+import { TCGplayerError, ValidationError } from '../errors.js';
 import {
   Tag,
   KickbackPromotion,
@@ -80,9 +80,3 @@ export class ContentResource {
   }
 }
 
-class ValidationError extends Error {
-  constructor(param: string, message: string) {
-    super(`Validation failed for "${param}": ${message}`);
-    this.name = 'ValidationError';
-  }
-}

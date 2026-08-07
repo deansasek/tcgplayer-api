@@ -11,7 +11,7 @@ npm install
 npm run build
 ```
 
-## SDK (Recommended)
+## SDK
 
 The SDK provides a typed, class-based interface organized by resource.
 
