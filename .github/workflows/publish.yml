@@ -30,7 +30,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Configure npm for GitHub Packages
+      - name: Configure npm for GitHub Packages (root)
         run: |
           echo "@deansasek:registry=https://npm.pkg.github.com" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
@@ -45,6 +45,8 @@ jobs:
           npm pkg set version=$VERSION
 
       - name: Publish MCP package
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd mcp
           npm publish
