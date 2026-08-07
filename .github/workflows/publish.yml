@@ -18,8 +18,8 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Get version
-        id: version
+      - name: Get SDK version
+        id: sdk-version
         run: echo "VERSION=$(npm version patch --no-git-tag-version)" >> $GITHUB_OUTPUT
 
       - name: Install dependencies
@@ -33,5 +33,13 @@ jobs:
           echo "@deansasek:registry=https://npm.pkg.github.com" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
-      - name: Publish to npm
+      - name: Publish SDK
+        run: npm publish
+
+      - name: Update MCP package version
+        working-directory: mcp
+        run: npm version ${{ from env.VERSION }} --no-git-tag-version
+
+      - name: Publish MCP package
+        working-directory: mcp
         run: npm publish

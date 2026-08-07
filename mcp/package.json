@@ -1,0 +1,13 @@
+{
+  "name": "@deansasek/tcgplayer-api-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for TCGplayer API",
+  "type": "module",
+  "bin": "../../dist/mcp/server.js",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
+  },
+  "dependencies": {
+    "@deansasek/tcgplayer-api": "*"
+  }
+}

@@ -2,7 +2,7 @@
   "mcpServers": {
     "tcgplayer-api-mcp": {
       "command": "npx",
-      "args": ["tsx", "mcp/server.ts"]
+      "args": ["@deansasek/tcgplayer-api-mcp"]
     }
   }
 }
