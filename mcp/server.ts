@@ -153,6 +153,17 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
+        name: 'tcgplayer_sku_market_prices',
+        description: 'Get market prices for multiple SKUs',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            skuIds: { type: 'array', items: { type: 'number' }, description: 'Array of SKU IDs' },
+          },
+          required: ['skuIds'],
+        },
+      },
+      {
         name: 'tcgplayer_category_filters',
         description: 'Get available filter options (conditions, languages, variants) for a category',
         inputSchema: {
@@ -168,6 +179,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         inputSchema: {
           type: 'object',
           properties: {},
+        },
+      },
+      {
+        name: 'tcgplayer_product_line_mappings',
+        description: 'Get filter field mappings for a product line',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            productLine: { type: 'string', description: 'Product line name (default: Pokemon)' },
+          },
         },
       },
       {
@@ -399,6 +420,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
+      case 'tcgplayer_sku_market_prices': {
+        const results = await getSkuMarketPrices(args.skuIds as number[]);
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
       case 'tcgplayer_category_filters': {
         const results = await getCategoryFilters((args.categoryId as string) || '3');
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
@@ -406,6 +432,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'tcgplayer_product_lines': {
         const results = await getProductLines();
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_product_line_mappings': {
+        const results = await getProductLineMappings((args.productLine as string) || 'Pokemon');
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
