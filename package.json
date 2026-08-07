@@ -1,4 +1,12 @@
 {
+  "name": "tcgplayer-api",
+  "version": "1.0.0",
+  "description": "REST API wrapper for TCGplayer",
+  "type": "module",
+  "main": "server.js",
+  "exports": {
+    ".": "./server.js"
+  },
   "dependencies": {
     "@playwright/test": "^1.62.1"
   }
