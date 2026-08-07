@@ -1,13 +1,23 @@
 /**
  * TCGplayer REST API Wrapper
  *
- * Endpoints:
- * - Autocomplete:      https://data.tcgplayer.com/autocomplete
- * - Product Details:    https://mp-search-api.tcgplayer.com/v2/product/{id}/details
- * - Latest Sales:       https://mpapi.tcgplayer.com/v2/product/{id}/latestsales
- * - Price History:      https://infinite-api.tcgplayer.com/price/history/{id}/detailed
- * - Market Price:       https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/{skuId}/volatility
- * - Buylist:            https://mpgateway.tcgplayer.com/v1/pricepoints/buylist/marketprice/products/{id}
+ * Discovered Endpoints:
+ * - Autocomplete:         https://data.tcgplayer.com/autocomplete
+ * - Product Search:       https://mp-search-api.tcgplayer.com/v1/search/request
+ * - Product Details:      https://mp-search-api.tcgplayer.com/v2/product/{id}/details
+ * - Latest Sales:         https://mpapi.tcgplayer.com/v2/product/{id}/latestsales
+ * - Price History:        https://infinite-api.tcgplayer.com/price/history/{id}/detailed
+ * - Market Price (SKU):   https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/{skuId}/volatility
+ * - Buylist:             https://mpgateway.tcgplayer.com/v1/pricepoints/buylist/marketprice/products/{id}
+ * - SKU Market Price:     https://mpgateway.tcgplayer.com/v1/pricepoints/marketprice/skus/search
+ * - Recommendations:      https://mp-search-api.tcgplayer.com/v1/recommendation/faceted
+ * - Product Lines:        https://mp-search-api.tcgplayer.com/v1/search/productLines
+ * - Catalog Groups:       https://mp-search-api.tcgplayer.com/v2/Catalog/CatalogGroups
+ * - Category Filters:     https://mp-search-api.tcgplayer.com/v1/product/categoryfilters
+ * - Latest Sets:          https://mp-search-api.tcgplayer.com/v1/product/latestsets/{ids}
+ * - Free Shipping:        https://mp-search-api.tcgplayer.com/v2/param/freeshippingthreshold
+ * - User:                 https://mp-search-api.tcgplayer.com/v2/user
+ * - Kickbacks:            https://mp-search-api.tcgplayer.com/v2/kickbacks
  */
 
 const BASE_URLS = {
@@ -15,7 +25,7 @@ const BASE_URLS = {
   mpapi: 'https://mpapi.tcgplayer.com',
   'mp-search-api': 'https://mp-search-api.tcgplayer.com',
   'infinite-api': 'https://infinite-api.tcgplayer.com',
-  'mpgateway': 'https://mpgateway.tcgplayer.com',
+  mpgateway: 'https://mpgateway.tcgplayer.com',
 };
 
 const DEFAULT_HEADERS = {
@@ -73,6 +83,76 @@ export async function autocomplete(query, options = {}) {
 
   const data = await response.json();
   return data.products || [];
+}
+
+/**
+ * Search products with full filtering, sorting, and pagination
+ * @param {Object} options - Search options
+ * @param {string} options.q - Search query
+ * @param {string} options.productLine - Product line name (default: 'Pokemon')
+ * @param {number} options.from - Offset for pagination (default: 0)
+ * @param {number} options.size - Number of results (default: 24)
+ * @param {string} options.algorithm - Search algorithm (default: 'sales_dismax')
+ * @param {Object} options.filters - Additional filters
+ * @param {Object} options.sort - Sort options
+ * @param {string} options.shippingCountry - Shipping country (default: 'US')
+ * @returns {Promise<Object>} - Search results with aggregations
+ */
+export async function search(options = {}) {
+  const {
+    q = '',
+    productLine = 'Pokemon',
+    from = 0,
+    size = 24,
+    algorithm = 'sales_dismax',
+    filters = {},
+    sort = {},
+    shippingCountry = 'US',
+  } = options;
+
+  const body = {
+    algorithm,
+    from,
+    size,
+    filters: {
+      term: {
+        productLineName: [productLine],
+        ...filters.term,
+      },
+      range: filters.range || {},
+      match: filters.match || {},
+    },
+    listingSearch: {
+      context: { cart: { packages: {} } },
+      filters: {
+        term: { sellerStatus: 'Live', channelId: 0 },
+        range: { quantity: { gte: 1 } },
+        exclude: { channelExclusion: 0 },
+      },
+    },
+    context: {
+      cart: { packages: {} },
+      shippingCountry,
+      userProfile: {},
+    },
+    settings: {
+      useFuzzySearch: true,
+      didYouMean: {},
+    },
+    sort,
+  };
+
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/search/request?q=${encodeURIComponent(q)}&isList=false&mpfev=5429`, {
+    method: 'POST',
+    headers: POST_HEADERS,
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Search failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
 }
 
 /**
@@ -192,33 +272,202 @@ export async function getBuylistPrice(productId, mpfev = '5429') {
 }
 
 /**
+ * Get market prices for multiple SKUs at once
+ * @param {Array<number>} skuIds - Array of SKU IDs
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Array>} - Market price data for SKUs
+ */
+export async function getSkuMarketPrices(skuIds, mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS.mpgateway}/v1/pricepoints/marketprice/skus/search?mpfev=${mpfev}`, {
+    method: 'POST',
+    headers: POST_HEADERS,
+    body: JSON.stringify({ skuIds }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`SKU market prices failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get product recommendations
+ * @param {number|string} productId - Product ID to get recommendations for
+ * @param {Object} options - Options
+ * @param {number} options.limit - Number of recommendations (default: 10)
+ * @param {string} options.mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Object>} - Recommendations data
+ */
+export async function getRecommendations(productId, options = {}) {
+  const { limit = 10, mpfev = '5429' } = options;
+
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/recommendation/faceted?mpfev=${mpfev}`, {
+    method: 'POST',
+    headers: POST_HEADERS,
+    body: JSON.stringify({
+      productIds: [productId],
+      limit,
+      enabledFacets: {
+        alreadyOwned: { externalUserId: '00000000-0000-0000-0000-000000000000' },
+        order: {},
+        unrecommended: {},
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Recommendations failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get available product lines/categories
+ * @returns {Promise<Array>} - List of product lines
+ */
+export async function getProductLines() {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/search/productLines`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Product lines failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get catalog groups
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Array>} - Catalog groups
+ */
+export async function getCatalogGroups(mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/Catalog/CatalogGroups?mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Catalog groups failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get category filters for a product line
+ * @param {number|string} categoryId - Category ID (default: 3 for Pokemon)
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Array>} - Category filters
+ */
+export async function getCategoryFilters(categoryId = '3', mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/product/categoryfilters?categoryId=${categoryId}&mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Category filters failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get latest sets for product lines
+ * @param {string} productLineIds - Comma-separated product line IDs (default: '1,2,3,71,68,63,79,62,85')
+ * @returns {Promise<Object>} - Latest sets data
+ */
+export async function getLatestSets(productLineIds = '1,2,3,71,68,63,79,62,85') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/product/latestsets/${productLineIds}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Latest sets failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get free shipping threshold
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Object>} - Free shipping threshold data
+ */
+export async function getFreeShippingThreshold(mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/param/freeshippingthreshold?mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Free shipping threshold failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get kickback/promotion data
+ * @param {boolean} active - Filter for active kickbacks only (default: true)
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Array>} - Kickback data
+ */
+export async function getKickbacks(active = true, mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/kickbacks?active=${active}&mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Kickbacks failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get user info (if authenticated)
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Object>} - User data
+ */
+export async function getUser(mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/user?mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`User failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get country codes for shipping
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Array>} - Country codes
+ */
+export async function getCountryCodes(mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/address/countryCodes?mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Country codes failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * Search products with full details (convenience function)
  * @param {string} query - Search query
  * @param {Object} options - Options
- * @returns {Promise<Object>} - Product with details and sales
+ * @returns {Promise<Object>} - Search results
  */
 export async function searchProducts(query, options = {}) {
-  const { productLine = 'Pokemon' } = options;
-
-  // First get autocomplete results
-  const products = await autocomplete(query, { productLine });
-
-  // Filter out duplicates and products without IDs
-  const uniqueProducts = products.filter(p => !p.duplicate && p['product-id']);
-
-  // Get details for first 5 products
-  const withDetails = await Promise.all(
-    uniqueProducts.slice(0, 5).map(async (p) => {
-      try {
-        const details = await getProductDetails(p['product-id']);
-        return { ...p, details };
-      } catch {
-        return p;
-      }
-    })
-  );
-
-  return withDetails;
+  return search({ q: query, ...options });
 }
 
 /**
@@ -238,11 +487,22 @@ export async function getProduct(productId) {
 
 export default {
   autocomplete,
+  search,
   getProductDetails,
   getLatestSales,
   getPriceHistory,
   getVolatility,
   getBuylistPrice,
+  getSkuMarketPrices,
+  getRecommendations,
+  getProductLines,
+  getCatalogGroups,
+  getCategoryFilters,
+  getLatestSets,
+  getFreeShippingThreshold,
+  getKickbacks,
+  getUser,
+  getCountryCodes,
   searchProducts,
   getProduct,
 };
