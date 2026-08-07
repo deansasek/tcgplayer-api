@@ -10,6 +10,7 @@ import {
   AutocompleteProduct,
   TrendingSuggestion,
   BestsellerProduct,
+  SearchResult,
 } from '../types.js';
 import { BASE_URLS, DEFAULT_HEADERS, POST_HEADERS } from '../constants.js';
 
@@ -86,7 +87,7 @@ export class SearchResource {
    * @param options.from - Offset for pagination (default: 0)
    * @param options.size - Results per page (default: 24)
    */
-  async fullSearch(options: SearchOptions = {}): Promise<unknown> {
+  async fullSearch(options: SearchOptions = {}): Promise<SearchResult> {
     const {
       q = '',
       productLine = 'Pokemon',
@@ -131,7 +132,12 @@ export class SearchResource {
     };
 
     const url = `${BASE_URLS['mp-search-api']}/v1/search/request?q=${encodeURIComponent(q)}&isList=false&mpfev=5429`;
-    return postRequest(url, body);
+    const data = await postRequest<{ errors: unknown[]; results: SearchResult[] }>(url, body);
+    // API returns { errors: [], results: [{ aggregations, results, totalResults, ... }] }
+    // Unwrap to return the first result directly
+    const first = data.results?.[0];
+    if (!first) return { totalResults: 0, aggregations: {}, results: [] };
+    return first;
   }
 
   /**
