@@ -138,6 +138,16 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
+        name: 'tcg_category_filters',
+        description: 'Get available filter options (conditions, languages, variants) for a category',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            categoryId: { type: 'string', description: 'Category ID (default: 3 for Pokemon, 1 for Magic)' },
+          },
+        },
+      },
+      {
         name: 'tcg_product_lines',
         description: 'Get all available product lines',
         inputSchema: {
@@ -217,6 +227,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'tcg_buylist_price': {
         const results = await getBuylistPrice(args.productId);
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcg_category_filters': {
+        const results = await getCategoryFilters(args.categoryId || '3');
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
