@@ -1,6 +1,6 @@
 # TCGplayer API
 
-A TypeScript SDK and REST API wrapper for [TCGplayer](https://www.tcgplayer.com/) providing structured access to trading card data including Pokemon, Magic: The Gathering, and other TCGs — with an MCP server for Claude Code integration.
+An SDK and REST API wrapper for [TCGplayer](https://www.tcgplayer.com/) providing structured access to trading card data including Pokemon, Magic: The Gathering, and other TCGs — with an MCP server for Claude Code integration.
 
 > **Disclaimer:** This wrapper is an unofficial tool created for educational purposes only. It is not affiliated with, maintained, or endorsed by TCGplayer. Use of this wrapper may violate TCGplayer's terms of service.
 
