@@ -324,23 +324,6 @@ export async function getProductLineMappings(productLine = 'Pokemon', mpfev = '5
 }
 
 /**
- * Get catalog groups
- * @param {string} mpfev - MPF event ID (default: 5429)
- * @returns {Promise<Array>} - Catalog groups
- */
-export async function getCatalogGroups(mpfev = '5429') {
-  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/Catalog/CatalogGroups?mpfev=${mpfev}`, {
-    headers: DEFAULT_HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Catalog groups failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
  * Get category filters for a product line
  * @param {number|string} categoryId - Category ID (default: 3 for Pokemon)
  * @param {string} mpfev - MPF event ID (default: 5429)
@@ -370,40 +353,6 @@ export async function getLatestSets(productLineIds = '1,2,3,71,68,63,79,62,85') 
 
   if (!response.ok) {
     throw new Error(`Latest sets failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Get free shipping threshold
- * @param {string} mpfev - MPF event ID (default: 5429)
- * @returns {Promise<Object>} - Free shipping threshold data
- */
-export async function getFreeShippingThreshold(mpfev = '5429') {
-  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/param/freeshippingthreshold?mpfev=${mpfev}`, {
-    headers: DEFAULT_HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Free shipping threshold failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Get country codes for shipping
- * @param {string} mpfev - MPF event ID (default: 5429)
- * @returns {Promise<Array>} - Country codes
- */
-export async function getCountryCodes(mpfev = '5429') {
-  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/address/countryCodes?mpfev=${mpfev}`, {
-    headers: DEFAULT_HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Country codes failed: ${response.status} ${response.statusText}`);
   }
 
   return response.json();
@@ -445,11 +394,8 @@ export default {
   getSkuMarketPrices,
   getProductLines,
   getProductLineMappings,
-  getCatalogGroups,
   getCategoryFilters,
   getLatestSets,
-  getFreeShippingThreshold,
-  getCountryCodes,
   searchProducts,
   getProduct,
 };
