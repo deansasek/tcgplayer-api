@@ -1,5 +1,7 @@
 # TCGplayer API
 
+> **Disclaimer:** This wrapper is an unofficial tool created for educational purposes only. It is not affiliated with, maintained, or endorsed by TCGplayer. Use of this wrapper may violate TCGplayer's terms of service.
+
 A REST API wrapper for [TCGplayer](https://www.tcgplayer.com/) providing structured access to trading card data including Pokemon, Magic: The Gathering, and other TCGs.
 
 ## Overview
@@ -178,6 +180,56 @@ autocomplete('gundam', { productLine: 'Gundam Card Game' });
 | `getProductLineMappings` | `https://mp-search-api.tcgplayer.com/v1/search/productLineMappings` | GET |
 | `getCategoryFilters` | `https://mp-search-api.tcgplayer.com/v1/product/categoryfilters` | GET |
 | `getLatestSets` | `https://mp-search-api.tcgplayer.com/v1/product/latestsets/{ids}` | GET |
+
+## MCP Server (Claude Code Integration)
+
+This package includes an MCP (Model Context Protocol) server for use with Claude Code, enabling Claude to interact with TCGplayer data directly.
+
+### Installation
+
+The MCP server is configured in `.mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "tcgplayer-api-mcp": {
+      "command": "node",
+      "args": ["./mcp/server.js"]
+    }
+  }
+}
+```
+
+Claude Code will automatically detect and use MCP servers defined in `.mcp.json`.
+
+### Available MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `tcg_autocomplete` | Search for TCGplayer products by name |
+| `tcg_search` | Search products with filters and pagination |
+| `tcg_product` | Get full product data (details, sales, price history) |
+| `tcg_product_details` | Get detailed product information |
+| `tcg_latest_sales` | Get recent sales data for a product |
+| `tcg_price_history` | Get historical pricing data |
+| `tcg_volatility` | Get market volatility for a SKU |
+| `tcg_buylist_price` | Get buylist/market prices for a product |
+| `tcg_category_filters` | Get available filter options (conditions, languages, variants) |
+| `tcg_product_lines` | Get all available product lines |
+| `tcg_latest_sets` | Get latest sets for product lines |
+
+### Usage Examples
+
+```
+User: Search for Morpeko cards on TCGplayer
+Claude uses: tcg_search with q="morpeko"
+
+User: Get the latest sales for product 704874
+Claude uses: tcg_latest_sales with productId=704874
+
+User: What conditions and languages are available for Pokemon?
+Claude uses: tcg_category_filters with categoryId="3"
+```
 
 ## Examples
 
