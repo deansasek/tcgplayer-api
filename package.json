@@ -2,6 +2,7 @@
   "name": "tcgplayer-api",
   "version": "1.0.0",
   "description": "REST API wrapper for TCGplayer",
+  "author": "https://github.com/deansasek",
   "type": "module",
   "main": "server.js",
   "exports": {
