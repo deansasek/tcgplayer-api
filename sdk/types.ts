@@ -302,9 +302,8 @@ export interface BestsellerProduct {
 
 /** Trending suggestion item */
 export interface TrendingSuggestion {
-  productId: number;
-  productName: string;
-  marketPrice: number;
+  term: string;
+  score: number;
 }
 
 /** Catalog group (TCG vs Tabletop) */

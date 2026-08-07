@@ -137,27 +137,37 @@ export class SearchResource {
   /**
    * Get best-selling products for a category.
    *
+   * Note: The API ignores the limit parameter and returns all ~51k results.
+   * Results are truncated client-side to the requested limit.
+   *
    * @param options.categoryId - Category ID (default: "3" for Pokemon)
-   * @param options.limit - Number of results (default: 20)
+   * @param options.limit - Number of results to return (default: 20)
    */
-  async bestsellers(options: { categoryId?: string; limit?: number } = {}): Promise<unknown> {
+  async bestsellers(options: { categoryId?: string; limit?: number } = {}): Promise<unknown[]> {
     const { categoryId = '3', limit = 20 } = options;
     const params = new URLSearchParams({ categoryId, limit: String(limit) });
     const url = `${BASE_URLS['mp-search-api']}/v1/search/bestsellers?${params}`;
-    return request(url);
+    // API ignores limit - returns nested results: [{ results: [...], aggregations: {...} }]
+    const data = await request<{ results: Array<{ results: unknown[] }> }>(url);
+    const allProducts = (data.results || []).flatMap(group => group.results || []);
+    return allProducts.slice(0, limit);
   }
 
   /**
    * Get trending product suggestions.
    *
-   * @param options.productLine - Product line to get trending for (default: "Pokemon")
-   * @param options.limit - Number of suggestions (default: 10)
+   * Note: The API only accepts { sessionId }. The productLine and limit parameters
+   * are accepted for API compatibility but have no effect on the response.
+   *
+   * @param options.productLine - (ignored) Product line - kept for API compatibility
+   * @param options.limit - (ignored) Number of suggestions - kept for API compatibility
    */
-  async trending(options: { productLine?: string; limit?: number } = {}): Promise<{ products?: TrendingSuggestion[] }> {
-    const { productLine = 'Pokemon', limit = 10 } = options;
+  async trending(options: { productLine?: string; limit?: number } = {}): Promise<TrendingSuggestion[]> {
+    const { sessionId = generateSessionId() } = options as { sessionId?: string };
     const url = `${BASE_URLS.data}/suggestions/trending`;
-    const body = { productLine, limit: Number(limit) };
-    const data = await postRequest<{ products?: TrendingSuggestion[] }>(url, body);
-    return data;
+    // API only accepts { sessionId } - productLine and limit are invalid keys
+    const body = { sessionId };
+    const data = await postRequest<{ results: TrendingSuggestion[] }>(url, body);
+    return data.results || [];
   }
 }

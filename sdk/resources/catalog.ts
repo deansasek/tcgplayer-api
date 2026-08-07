@@ -114,9 +114,18 @@ export class CatalogResource {
 
   /**
    * Get available country codes for shipping.
+   *
+   * @param options.offset - Pagination offset (default: 0)
+   * @param options.limit - Number of results per page (default: 100)
    */
-  async countryCodes(): Promise<CountryCode[]> {
+  async countryCodes(options: { offset?: number; limit?: number } = {}): Promise<{ countries: CountryCode[]; total: number }> {
+    const { offset = 0, limit = 100 } = options;
     const url = `${BASE_URLS.mpapi}/v2/address/countryCodes`;
-    return request<CountryCode[]>(url);
+    const data = await request<{ errors: unknown[]; results: CountryCode[] }>(url);
+    const allCountries = data.results || [];
+    return {
+      countries: allCountries.slice(offset, offset + limit),
+      total: allCountries.length,
+    };
   }
 }

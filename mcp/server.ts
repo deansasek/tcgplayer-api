@@ -252,12 +252,12 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       },
       {
         name: 'tcgplayer_trending',
-        description: 'Get trending product suggestions',
+        description: 'Get trending search term suggestions. Note: productLine and limit parameters are accepted but have no effect on the API.',
         inputSchema: {
           type: 'object',
           properties: {
-            productLine: { type: 'string', description: 'Product line (default: Pokemon)' },
-            limit: { type: 'number', description: 'Results limit (default: 10)' },
+            productLine: { type: 'string', description: '(ignored) Product line - accepted for compatibility only' },
+            limit: { type: 'number', description: '(ignored) Results limit - accepted for compatibility only' },
           },
         },
       },
@@ -282,7 +282,10 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         description: 'Get available country codes for shipping',
         inputSchema: {
           type: 'object',
-          properties: {},
+          properties: {
+            offset: { type: 'number', description: 'Pagination offset (default: 0)' },
+            limit: { type: 'number', description: 'Results per page (default: 100)' },
+          },
         },
       },
       {
@@ -483,10 +486,8 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'tcgplayer_trending': {
-        const results = await client.search.trending({
-          productLine: (args.productLine as string) || 'Pokemon',
-          limit: (args.limit as number) || 10,
-        });
+        // productLine and limit are passed but ignored by the API (only sessionId is used)
+        const results = await client.search.trending({});
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
@@ -496,7 +497,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'tcgplayer_country_codes': {
-        const results = await client.catalog.countryCodes();
+        const results = await client.catalog.countryCodes({
+          offset: (args.offset as number) || 0,
+          limit: (args.limit as number) || 100,
+        });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
