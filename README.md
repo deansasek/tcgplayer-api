@@ -231,6 +231,46 @@ Get trending product suggestions.
 const trending = await getTrending({ productLine: 'Pokemon', limit: 10 });
 ```
 
+### getCatalogGroups()
+
+Get catalog groups (TCG vs Tabletop categories).
+
+```javascript
+const groups = await getCatalogGroups();
+```
+
+### getFreeShippingThreshold()
+
+Get minimum order amount for free shipping.
+
+```javascript
+const threshold = await getFreeShippingThreshold();
+```
+
+### getCountryCodes()
+
+Get available country codes for shipping.
+
+```javascript
+const codes = await getCountryCodes();
+```
+
+### getArticles(options)
+
+Get articles for a vertical.
+
+```javascript
+const articles = await getArticles({ vertical: 'pokemon', limit: 10 });
+```
+
+### getTrendingArticles(options)
+
+Get trending articles.
+
+```javascript
+const trending = await getTrendingArticles({ limit: 10 });
+```
+
 ## Product Line Options
 
 ```javascript
@@ -263,6 +303,11 @@ autocomplete('gundam', { productLine: 'Gundam Card Game' });
 | `getVerticals` | `https://infinite-api.tcgplayer.com/c/verticals/` | GET |
 | `getBestsellers` | `https://mp-search-api.tcgplayer.com/v1/search/bestsellers` | GET |
 | `getTrending` | `https://data.tcgplayer.com/suggestions/trending` | POST |
+| `getCatalogGroups` | `https://mpapi.tcgplayer.com/v2/Catalog/CatalogGroups` | GET |
+| `getFreeShippingThreshold` | `https://mpapi.tcgplayer.com/v2/param/freeshippingthreshold` | GET |
+| `getCountryCodes` | `https://mpapi.tcgplayer.com/v2/address/countryCodes` | GET |
+| `getArticles` | `https://infinite-api.tcgplayer.com/c/articles/` | GET |
+| `getTrendingArticles` | `https://infinite-api.tcgplayer.com/content/articles/trending/` | GET |
 
 ## MCP Server (Claude Code Integration)
 
@@ -308,6 +353,11 @@ Claude Code will automatically detect and use MCP servers defined in `.mcp.json`
 | `tcgplayer_verticals` | Get available game verticals |
 | `tcgplayer_bestsellers` | Get best-selling products for a category |
 | `tcgplayer_trending` | Get trending product suggestions |
+| `tcgplayer_catalog_groups` | Get catalog groups (TCG vs Tabletop categories) |
+| `tcgplayer_free_shipping_threshold` | Get minimum order for free shipping |
+| `tcgplayer_country_codes` | Get available country codes for shipping |
+| `tcgplayer_articles` | Get articles for a vertical |
+| `tcgplayer_trending_articles` | Get trending articles |
 
 ### Usage Examples
 

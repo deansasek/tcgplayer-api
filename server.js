@@ -551,6 +551,99 @@ export async function getTrending(options = {}) {
 }
 
 /**
+ * Get catalog groups (TCG vs Tabletop categories)
+ * @returns {Promise<Object>} - Catalog groups
+ */
+export async function getCatalogGroups() {
+  const response = await fetch(`${BASE_URLS.mpapi}/v2/Catalog/CatalogGroups`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Catalog groups failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get free shipping threshold
+ * @returns {Promise<number>} - Minimum order amount for free shipping
+ */
+export async function getFreeShippingThreshold() {
+  const response = await fetch(`${BASE_URLS.mpapi}/v2/param/freeshippingthreshold`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Free shipping threshold failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get available country codes for shipping
+ * @returns {Promise<Object>} - Country codes
+ */
+export async function getCountryCodes() {
+  const response = await fetch(`${BASE_URLS.mpapi}/v2/address/countryCodes`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Country codes failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get articles for a vertical
+ * @param {Object} options - Options
+ * @param {string} options.vertical - Vertical name (default: 'pokemon')
+ * @param {number} options.limit - Results limit (default: 10)
+ * @returns {Promise<Object>} - Articles data
+ */
+export async function getArticles(options = {}) {
+  const { vertical = 'pokemon', limit = 10 } = options;
+
+  const params = new URLSearchParams({ vertical, limit: String(limit) });
+
+  const response = await fetch(`${BASE_URLS['infinite-api']}/c/articles/?${params}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Articles failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get trending articles
+ * @param {Object} options - Options
+ * @param {number} options.limit - Results limit (default: 10)
+ * @returns {Promise<Object>} - Trending articles
+ */
+export async function getTrendingArticles(options = {}) {
+  const { limit = 10 } = options;
+
+  const params = new URLSearchParams({ limit: String(limit) });
+
+  const response = await fetch(`${BASE_URLS['infinite-api']}/content/articles/trending/?${params}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Trending articles failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * Search products with full details (convenience function)
  * @param {string} query - Search query
  * @param {Object} options - Options
@@ -596,6 +689,11 @@ export default {
   getVerticals,
   getBestsellers,
   getTrending,
+  getCatalogGroups,
+  getFreeShippingThreshold,
+  getCountryCodes,
+  getArticles,
+  getTrendingArticles,
   searchProducts,
   getProduct,
 };

@@ -26,6 +26,11 @@ import {
   getVerticals,
   getBestsellers,
   getTrending,
+  getCatalogGroups,
+  getFreeShippingThreshold,
+  getCountryCodes,
+  getArticles,
+  getTrendingArticles,
   getProduct,
 } from '../server.js';
 
@@ -260,6 +265,51 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: 'tcgplayer_catalog_groups',
+        description: 'Get catalog groups (TCG vs Tabletop categories)',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'tcgplayer_free_shipping_threshold',
+        description: 'Get minimum order amount for free shipping',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'tcgplayer_country_codes',
+        description: 'Get available country codes for shipping',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'tcgplayer_articles',
+        description: 'Get articles for a vertical',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            vertical: { type: 'string', description: 'Vertical name (default: pokemon)' },
+            limit: { type: 'number', description: 'Results limit (default: 10)' },
+          },
+        },
+      },
+      {
+        name: 'tcgplayer_trending_articles',
+        description: 'Get trending articles',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            limit: { type: 'number', description: 'Results limit (default: 10)' },
+          },
+        },
+      },
     ],
   };
 });
@@ -388,6 +438,36 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'tcgplayer_trending': {
         const results = await getTrending({
           productLine: args.productLine || 'Pokemon',
+          limit: args.limit || 10,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_catalog_groups': {
+        const results = await getCatalogGroups();
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_free_shipping_threshold': {
+        const results = await getFreeShippingThreshold();
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_country_codes': {
+        const results = await getCountryCodes();
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_articles': {
+        const results = await getArticles({
+          vertical: args.vertical || 'pokemon',
+          limit: args.limit || 10,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_trending_articles': {
+        const results = await getTrendingArticles({
           limit: args.limit || 10,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
