@@ -2,18 +2,23 @@ name: Publish to npm
 
 on:
   push:
-    branches:
-      - main
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
     steps:
       - uses: actions/checkout@v4
+
+      - name: Extract version from tag
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+        id: version
 
       - uses: actions/setup-node@v4
         with:
@@ -30,10 +35,14 @@ jobs:
           echo "@deansasek:registry=https://npm.pkg.github.com" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
-      - name: Set SDK version
+      - name: Set version from tag and commit
         run: |
-          VERSION="1.0.${{ github.run_number }}"
-          npm pkg set version=$VERSION
+          npm pkg set version=${{ steps.version.outputs.VERSION }}
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add package.json package-lock.json
+          git commit -m "chore: set version to ${{ steps.version.outputs.VERSION }}"
+          git push
 
       - name: Publish SDK
-        run: npm publish || true
+        run: npm publish
