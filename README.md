@@ -156,6 +156,81 @@ const product = await getProduct(704874);
 // Returns: { details, sales, priceHistory }
 ```
 
+### getProductListings(productId, options)
+
+Get detailed seller listings with filters.
+
+```javascript
+const listings = await getProductListings(704874, {
+  languages: ['English'],
+  conditions: ['Near Mint'],
+  quantityGte: 1
+});
+```
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `sellerStatus` | string | `'Live'` | Seller status filter |
+| `languages` | array | `['English']` | Language filters |
+| `conditions` | array | `[]` | Condition filters |
+| `quantityGte` | integer | `1` | Minimum quantity |
+
+### getSetName(setId)
+
+Get set information by set ID.
+
+```javascript
+const set = await getSetName(1234);
+```
+
+### getFacetedRecommendations(productIds, options)
+
+Get related product recommendations.
+
+```javascript
+const recs = await getFacetedRecommendations([704874, 12345], { limit: 10 });
+```
+
+### getKickbacks()
+
+Get active kickback promotions.
+
+```javascript
+const kickbacks = await getKickbacks();
+```
+
+### getTags(domains?, classifications?)
+
+Get product attribute tags for filtering.
+
+```javascript
+const tags = await getTags();
+```
+
+### getVerticals()
+
+Get available game verticals.
+
+```javascript
+const verticals = await getVerticals();
+```
+
+### getBestsellers(options)
+
+Get best-selling products for a category.
+
+```javascript
+const bestsellers = await getBestsellers({ categoryId: '3', limit: 20 });
+```
+
+### getTrending(options)
+
+Get trending product suggestions.
+
+```javascript
+const trending = await getTrending({ productLine: 'Pokemon', limit: 10 });
+```
+
 ## Product Line Options
 
 ```javascript
@@ -180,6 +255,14 @@ autocomplete('gundam', { productLine: 'Gundam Card Game' });
 | `getProductLineMappings` | `https://mp-search-api.tcgplayer.com/v1/search/productLineMappings` | GET |
 | `getCategoryFilters` | `https://mp-search-api.tcgplayer.com/v1/product/categoryfilters` | GET |
 | `getLatestSets` | `https://mp-search-api.tcgplayer.com/v1/product/latestsets/{ids}` | GET |
+| `getProductListings` | `https://mp-search-api.tcgplayer.com/v1/product/{id}/listings` | POST |
+| `getSetName` | `https://mpapi.tcgplayer.com/v2/Catalog/SetName/{setId}` | GET |
+| `getFacetedRecommendations` | `https://mpgateway.tcgplayer.com/v1/recommendation/faceted` | POST |
+| `getKickbacks` | `https://mpapi.tcgplayer.com/v2/kickbacks?active=true` | GET |
+| `getTags` | `https://infinite-api.tcgplayer.com/c/tags` | GET |
+| `getVerticals` | `https://infinite-api.tcgplayer.com/c/verticals/` | GET |
+| `getBestsellers` | `https://mp-search-api.tcgplayer.com/v1/search/bestsellers` | GET |
+| `getTrending` | `https://data.tcgplayer.com/suggestions/trending` | POST |
 
 ## MCP Server (Claude Code Integration)
 
@@ -217,6 +300,14 @@ Claude Code will automatically detect and use MCP servers defined in `.mcp.json`
 | `tcgplayer_category_filters` | Get available filter options (conditions, languages, variants) |
 | `tcgplayer_product_lines` | Get all available product lines |
 | `tcgplayer_latest_sets` | Get latest sets for product lines |
+| `tcgplayer_product_listings` | Get detailed product listings with filters |
+| `tcgplayer_set_name` | Get set information by set ID |
+| `tcgplayer_recommendations` | Get faceted product recommendations |
+| `tcgplayer_kickbacks` | Get active kickback promotions |
+| `tcgplayer_tags` | Get product attribute tags for filtering |
+| `tcgplayer_verticals` | Get available game verticals |
+| `tcgplayer_bestsellers` | Get best-selling products for a category |
+| `tcgplayer_trending` | Get trending product suggestions |
 
 ### Usage Examples
 

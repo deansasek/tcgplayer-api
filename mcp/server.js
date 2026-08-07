@@ -18,6 +18,14 @@ import {
   getProductLineMappings,
   getCategoryFilters,
   getLatestSets,
+  getProductListings,
+  getSetName,
+  getFacetedRecommendations,
+  getKickbacks,
+  getTags,
+  getVerticals,
+  getBestsellers,
+  getTrending,
   getProduct,
 } from '../server.js';
 
@@ -165,6 +173,93 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: 'tcgplayer_product_listings',
+        description: 'Get detailed product listings with filters',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            productId: { type: 'number', description: 'TCGplayer product ID' },
+            sellerStatus: { type: 'string', description: 'Seller status filter (default: Live)' },
+            languages: { type: 'array', items: { type: 'string' }, description: 'Language filters' },
+            conditions: { type: 'array', items: { type: 'string' }, description: 'Condition filters' },
+            quantityGte: { type: 'number', description: 'Minimum quantity (default: 1)' },
+          },
+          required: ['productId'],
+        },
+      },
+      {
+        name: 'tcgplayer_set_name',
+        description: 'Get set information by set ID',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            setId: { type: 'number', description: 'TCGplayer set ID' },
+          },
+          required: ['setId'],
+        },
+      },
+      {
+        name: 'tcgplayer_recommendations',
+        description: 'Get faceted product recommendations based on product IDs',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            productIds: { type: 'array', items: { type: 'number' }, description: 'Array of product IDs' },
+            limit: { type: 'number', description: 'Max recommendations (default: 10)' },
+          },
+          required: ['productIds'],
+        },
+      },
+      {
+        name: 'tcgplayer_kickbacks',
+        description: 'Get active kickback promotions',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'tcgplayer_tags',
+        description: 'Get product attribute tags for filtering',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            domains: { type: 'string', description: 'Domain filter (default: marketplace)' },
+            classifications: { type: 'string', description: 'Classification filter (default: product line affinity)' },
+          },
+        },
+      },
+      {
+        name: 'tcgplayer_verticals',
+        description: 'Get available game verticals',
+        inputSchema: {
+          type: 'object',
+          properties: {},
+        },
+      },
+      {
+        name: 'tcgplayer_bestsellers',
+        description: 'Get best-selling products for a category',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            categoryId: { type: 'string', description: 'Category ID (default: 3 for Pokemon)' },
+            limit: { type: 'number', description: 'Results limit (default: 20)' },
+          },
+        },
+      },
+      {
+        name: 'tcgplayer_trending',
+        description: 'Get trending product suggestions',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            productLine: { type: 'string', description: 'Product line (default: Pokemon)' },
+            limit: { type: 'number', description: 'Results limit (default: 10)' },
+          },
+        },
+      },
     ],
   };
 });
@@ -242,6 +337,59 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'tcgplayer_latest_sets': {
         const results = await getLatestSets(args.productLineIds);
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_product_listings': {
+        const results = await getProductListings(args.productId, {
+          sellerStatus: args.sellerStatus || 'Live',
+          languages: args.languages || ['English'],
+          conditions: args.conditions || [],
+          quantityGte: args.quantityGte || 1,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_set_name': {
+        const results = await getSetName(args.setId);
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_recommendations': {
+        const results = await getFacetedRecommendations(args.productIds, {
+          limit: args.limit || 10,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_kickbacks': {
+        const results = await getKickbacks();
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_tags': {
+        const results = await getTags(args.domains || 'marketplace', args.classifications || 'product line affinity');
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_verticals': {
+        const results = await getVerticals();
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_bestsellers': {
+        const results = await getBestsellers({
+          categoryId: args.categoryId || '3',
+          limit: args.limit || 20,
+        });
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_trending': {
+        const results = await getTrending({
+          productLine: args.productLine || 'Pokemon',
+          limit: args.limit || 10,
+        });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 

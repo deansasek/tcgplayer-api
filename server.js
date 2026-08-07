@@ -368,6 +368,189 @@ export async function getLatestSets(productLineIds = '1,2,3,71,68,63,79,62,85') 
 }
 
 /**
+ * Get detailed product listings with filters
+ * @param {number|string} productId - TCGplayer product ID
+ * @param {Object} options - Options
+ * @param {string} options.sellerStatus - Seller status filter (default: 'Live')
+ * @param {number} options.channelId - Channel ID filter (default: 0)
+ * @param {Array} options.languages - Language filters (default: ['English'])
+ * @param {Array} options.conditions - Condition filters
+ * @param {number} options.quantityGte - Minimum quantity (default: 1)
+ * @returns {Promise<Object>} - Product listings
+ */
+export async function getProductListings(productId, options = {}) {
+  const {
+    sellerStatus = 'Live',
+    channelId = 0,
+    languages = ['English'],
+    conditions = [],
+    quantityGte = 1,
+  } = options;
+
+  const body = {
+    filters: {
+      term: {
+        sellerStatus,
+        channelId,
+        ...(languages.length ? { language: languages } : {}),
+        ...(conditions.length ? { condition: conditions } : {}),
+      },
+      range: { quantity: { gte: quantityGte } },
+    },
+  };
+
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/product/${productId}/listings`, {
+    method: 'POST',
+    headers: POST_HEADERS,
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Product listings failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get set information by set ID
+ * @param {number|string} setId - TCGplayer set ID
+ * @returns {Promise<Object>} - Set information
+ */
+export async function getSetName(setId) {
+  const response = await fetch(`${BASE_URLS.mpapi}/v2/Catalog/SetName/${setId}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Set name failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get faceted product recommendations
+ * @param {Array<number>} productIds - Array of product IDs
+ * @param {Object} options - Options
+ * @param {number} options.limit - Max recommendations (default: 10)
+ * @returns {Promise<Object>} - Recommendations
+ */
+export async function getFacetedRecommendations(productIds, options = {}) {
+  const { limit = 10 } = options;
+
+  const response = await fetch(`${BASE_URLS.mpgateway}/v1/recommendation/faceted`, {
+    method: 'POST',
+    headers: POST_HEADERS,
+    body: JSON.stringify({ productIds, limit }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Faceted recommendations failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get active kickback promotions
+ * @returns {Promise<Object>} - Kickback promotions
+ */
+export async function getKickbacks() {
+  const response = await fetch(`${BASE_URLS.mpapi}/v2/kickbacks?active=true`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Kickbacks failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get product attribute tags
+ * @param {string} domains - Domain filter (default: 'marketplace')
+ * @param {string} classifications - Classification filter (default: 'product line affinity')
+ * @returns {Promise<Object>} - Tags data
+ */
+export async function getTags(domains = 'marketplace', classifications = 'product line affinity') {
+  const params = new URLSearchParams({ domains, classifications });
+
+  const response = await fetch(`${BASE_URLS['infinite-api']}/c/tags?${params}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Tags failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get available game verticals
+ * @returns {Promise<Object>} - Verticals data
+ */
+export async function getVerticals() {
+  const response = await fetch(`${BASE_URLS['infinite-api']}/c/verticals/`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Verticals failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get best-selling products
+ * @param {Object} options - Options
+ * @param {string} options.categoryId - Category ID (default: '3' for Pokemon)
+ * @param {number} options.limit - Results limit (default: 20)
+ * @returns {Promise<Object>} - Bestsellers data
+ */
+export async function getBestsellers(options = {}) {
+  const { categoryId = '3', limit = 20 } = options;
+
+  const params = new URLSearchParams({ categoryId, limit: String(limit) });
+
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/search/bestsellers?${params}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Bestsellers failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Get trending product suggestions
+ * @param {Object} options - Options
+ * @param {string} options.productLine - Product line (default: 'Pokemon')
+ * @param {number} options.limit - Results limit (default: 10)
+ * @returns {Promise<Object>} - Trending suggestions
+ */
+export async function getTrending(options = {}) {
+  const { productLine = 'Pokemon', limit = 10 } = options;
+
+  const response = await fetch(`${BASE_URLS.data}/suggestions/trending`, {
+    method: 'POST',
+    headers: POST_HEADERS,
+    body: JSON.stringify({ productLine, limit }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Trending failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * Search products with full details (convenience function)
  * @param {string} query - Search query
  * @param {Object} options - Options
@@ -405,6 +588,14 @@ export default {
   getProductLineMappings,
   getCategoryFilters,
   getLatestSets,
+  getProductListings,
+  getSetName,
+  getFacetedRecommendations,
+  getKickbacks,
+  getTags,
+  getVerticals,
+  getBestsellers,
+  getTrending,
   searchProducts,
   getProduct,
 };
