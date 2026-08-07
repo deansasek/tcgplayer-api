@@ -306,6 +306,24 @@ export async function getProductLines() {
 }
 
 /**
+ * Get search filter field mappings for a product line
+ * @param {string} productLine - Product line name (default: 'Pokemon')
+ * @param {string} mpfev - MPF event ID (default: 5429)
+ * @returns {Promise<Array>} - Filter field mappings
+ */
+export async function getProductLineMappings(productLine = 'Pokemon', mpfev = '5429') {
+  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/search/productLineMappings?productLine=${encodeURIComponent(productLine)}&mpfev=${mpfev}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Product line mappings failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * Get catalog groups
  * @param {string} mpfev - MPF event ID (default: 5429)
  * @returns {Promise<Array>} - Catalog groups
@@ -426,6 +444,7 @@ export default {
   getBuylistPrice,
   getSkuMarketPrices,
   getProductLines,
+  getProductLineMappings,
   getCatalogGroups,
   getCategoryFilters,
   getLatestSets,
