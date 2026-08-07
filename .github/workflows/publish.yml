@@ -2,8 +2,8 @@ name: Publish to npm
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 jobs:
   publish:
@@ -14,39 +14,41 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Extract version from tag
+      - name: Check if already tagged
+        id: check
         run: |
-          TAG="${GITHUB_REF#refs/tags/}"
-          VERSION="${TAG#v}"
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Extracted version: $VERSION"
-        id: version
+          TAG=$(git describe --exact-match --tags 2>/dev/null || echo "")
+          if [[ -n "$TAG" ]]; then
+            echo "Already tagged as $TAG, skipping publish"
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "tag=$TAG" >> $GITHUB_OUTPUT
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Configure npm for GitHub Packages
+      - name: Bump version, commit, tag, and publish
+        if: steps.check.outputs.skip != 'true'
+        id: bump
         run: |
-          echo "@deansasek:registry=https://npm.pkg.github.com" >> .npmrc
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
-
-      - name: Set version and publish
-        env:
-          VERSION: ${{ steps.version.outputs.version }}
-        run: |
-          echo "Setting version to: $VERSION"
-          node -e "const pkg=JSON.parse(require('fs').readFileSync('package.json','utf8')); pkg.version=process.env.VERSION; require('fs').writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');"
-          cat package.json | grep '"version"'
+          CURRENT=$(node -p "require('./package.json').version")
+          IFS='.' read -r major minor patch <<< "$CURRENT"
+          NEW_VERSION="${major}.${minor}.$((patch + 1))"
+          echo "Bumping $CURRENT -> $NEW_VERSION"
+          node -e "
+            const fs=require('fs');
+            const pkg=JSON.parse(fs.readFileSync('package.json','utf8'));
+            pkg.version=process.env.NEW_VERSION;
+            fs.writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');
+          "
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add package.json package-lock.json
-          git commit -m "chore: set version to $VERSION"
-          git push
+          git commit -m "chore: bump version to $NEW_VERSION"
+          git tag "v$NEW_VERSION"
+          git push origin main --follow-tags
           npm publish
+
+      - name: Log skipped run
+        if: steps.check.outputs.skip == 'true'
+        run: |
+          echo "Version ${{ steps.check.outputs.tag }} already published, skipping"
