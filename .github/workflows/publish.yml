@@ -16,8 +16,10 @@ jobs:
 
       - name: Extract version from tag
         run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Extracted version: $VERSION"
         id: version
 
       - uses: actions/setup-node@v4
@@ -35,14 +37,16 @@ jobs:
           echo "@deansasek:registry=https://npm.pkg.github.com" >> .npmrc
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.NPM_TOKEN }}" >> .npmrc
 
-      - name: Set version from tag and commit
+      - name: Set version and publish
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
         run: |
-          npm pkg set version=${{ steps.version.outputs.VERSION }}
+          echo "Setting version to: $VERSION"
+          node -e "const pkg=JSON.parse(require('fs').readFileSync('package.json','utf8')); pkg.version=process.env.VERSION; require('fs').writeFileSync('package.json',JSON.stringify(pkg,null,2)+'\n');"
+          cat package.json | grep '"version"'
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add package.json package-lock.json
-          git commit -m "chore: set version to ${{ steps.version.outputs.VERSION }}"
+          git commit -m "chore: set version to $VERSION"
           git push
-
-      - name: Publish SDK
-        run: npm publish
+          npm publish
