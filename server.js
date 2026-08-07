@@ -16,8 +16,6 @@
  * - Category Filters:     https://mp-search-api.tcgplayer.com/v1/product/categoryfilters
  * - Latest Sets:          https://mp-search-api.tcgplayer.com/v1/product/latestsets/{ids}
  * - Free Shipping:        https://mp-search-api.tcgplayer.com/v2/param/freeshippingthreshold
- * - User:                 https://mp-search-api.tcgplayer.com/v2/user
- * - Kickbacks:            https://mp-search-api.tcgplayer.com/v2/kickbacks
  */
 
 const BASE_URLS = {
@@ -292,38 +290,6 @@ export async function getSkuMarketPrices(skuIds, mpfev = '5429') {
 }
 
 /**
- * Get product recommendations
- * @param {number|string} productId - Product ID to get recommendations for
- * @param {Object} options - Options
- * @param {number} options.limit - Number of recommendations (default: 10)
- * @param {string} options.mpfev - MPF event ID (default: 5429)
- * @returns {Promise<Object>} - Recommendations data
- */
-export async function getRecommendations(productId, options = {}) {
-  const { limit = 10, mpfev = '5429' } = options;
-
-  const response = await fetch(`${BASE_URLS['mp-search-api']}/v1/recommendation/faceted?mpfev=${mpfev}`, {
-    method: 'POST',
-    headers: POST_HEADERS,
-    body: JSON.stringify({
-      productIds: [productId],
-      limit,
-      enabledFacets: {
-        alreadyOwned: { externalUserId: '00000000-0000-0000-0000-000000000000' },
-        order: {},
-        unrecommended: {},
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    throw new Error(`Recommendations failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
  * Get available product lines/categories
  * @returns {Promise<Array>} - List of product lines
  */
@@ -409,41 +375,6 @@ export async function getFreeShippingThreshold(mpfev = '5429') {
 }
 
 /**
- * Get kickback/promotion data
- * @param {boolean} active - Filter for active kickbacks only (default: true)
- * @param {string} mpfev - MPF event ID (default: 5429)
- * @returns {Promise<Array>} - Kickback data
- */
-export async function getKickbacks(active = true, mpfev = '5429') {
-  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/kickbacks?active=${active}&mpfev=${mpfev}`, {
-    headers: DEFAULT_HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new Error(`Kickbacks failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
- * Get user info (if authenticated)
- * @param {string} mpfev - MPF event ID (default: 5429)
- * @returns {Promise<Object>} - User data
- */
-export async function getUser(mpfev = '5429') {
-  const response = await fetch(`${BASE_URLS['mp-search-api']}/v2/user?mpfev=${mpfev}`, {
-    headers: DEFAULT_HEADERS,
-  });
-
-  if (!response.ok) {
-    throw new Error(`User failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json();
-}
-
-/**
  * Get country codes for shipping
  * @param {string} mpfev - MPF event ID (default: 5429)
  * @returns {Promise<Array>} - Country codes
@@ -494,14 +425,11 @@ export default {
   getVolatility,
   getBuylistPrice,
   getSkuMarketPrices,
-  getRecommendations,
   getProductLines,
   getCatalogGroups,
   getCategoryFilters,
   getLatestSets,
   getFreeShippingThreshold,
-  getKickbacks,
-  getUser,
   getCountryCodes,
   searchProducts,
   getProduct,
