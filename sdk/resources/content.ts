@@ -9,7 +9,7 @@ import {
   Article,
   NormalizedCardName,
 } from '../types.js';
-import { BASE_URLS, DEFAULT_HEADERS, POST_HEADERS } from '../constants.js';
+import { BASE_URLS, DEFAULT_HEADERS } from '../constants.js';
 
 async function request<T>(url: string, options?: RequestInit): Promise<T> {
   const response = await fetch(url, {
@@ -27,40 +27,29 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-async function postRequest<T>(url: string, body: unknown): Promise<T> {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: POST_HEADERS,
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    throw new TCGplayerError(response.status, url, `POST ${url} failed: ${response.status} ${response.statusText}`);
-  }
-
-  return response.json() as Promise<T>;
-}
-
 export class ContentResource {
-  async articles(options: { vertical?: string; limit?: number } = {}): Promise<unknown> {
+  async articles(options: { vertical?: string; limit?: number } = {}): Promise<Article[]> {
     const { vertical = 'pokemon', limit = 10 } = options;
     const params = new URLSearchParams({ vertical, limit: String(limit) });
     const url = `${BASE_URLS['infinite-api']}/c/articles/?${params}`;
-    return request(url);
+    const data = await request<{ result: Article[] }>(url);
+    return data.result || [];
   }
 
-  async trendingArticles(options: { limit?: number } = {}): Promise<unknown> {
+  async trendingArticles(options: { limit?: number } = {}): Promise<Article[]> {
     const { limit = 10 } = options;
     const params = new URLSearchParams({ limit: String(limit) });
     const url = `${BASE_URLS['infinite-api']}/content/articles/trending/?${params}`;
-    return request(url);
+    const data = await request<{ result: Article[] }>(url);
+    return data.result || [];
   }
 
   async tags(options: { domains?: string; classifications?: string } = {}): Promise<Tag[]> {
     const { domains = 'marketplace', classifications = 'product line affinity' } = options;
     const params = new URLSearchParams({ domains, classifications });
     const url = `${BASE_URLS['infinite-api']}/c/tags?${params}`;
-    return request<Tag[]>(url);
+    const data = await request<{ result: Tag[] }>(url);
+    return data.result || [];
   }
 
   async kickbacks(options: { active?: boolean } = {}): Promise<KickbackPromotion[]> {
@@ -79,4 +68,3 @@ export class ContentResource {
     return request<NormalizedCardName>(url);
   }
 }
-
