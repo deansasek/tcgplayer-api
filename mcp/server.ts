@@ -331,6 +331,18 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           required: ['name'],
         },
       },
+      {
+        name: 'tcgplayer_render_card',
+        description: 'Render a TCGplayer card as ASCII art',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            productId: { type: 'number', description: 'TCGplayer product ID' },
+            width: { type: 'number', description: 'ASCII output width in characters (default: 64)' },
+          },
+          required: ['productId'],
+        },
+      },
     ],
   };
 });
@@ -514,6 +526,52 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       case 'tcgplayer_normalize_card_name': {
         const results = await client.content.normalizeCardName(args.name as string);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_render_card': {
+        try {
+          const width = (args.width as number) || 64;
+          const response = await client.products.infinite(args.productId as number);
+          const product = (response as any).result || response;
+
+          const { Jimp } = await import('jimp');
+          const imageUrl = product.tcgImageURL;
+          if (!imageUrl) {
+            return { content: [{ type: 'text', text: `No image for ${args.productId}` }], isError: true };
+          }
+
+          const imageBuffer = await fetch(imageUrl).then(r => r.arrayBuffer());
+          const image = await Jimp.read(Buffer.from(imageBuffer));
+
+          const aspectRatio = image.height / image.width;
+          const scaledHeight = Math.round(width * aspectRatio * 0.5);
+          const sampleX = image.width / width;
+          const sampleY = image.height / scaledHeight;
+
+          const chars = ' .:-=+*#%@';
+          let ascii = '';
+
+          for (let y = 0; y < scaledHeight; y++) {
+            for (let x = 0; x < width; x++) {
+              const px = Math.min(Math.floor(x * sampleX), image.width - 1);
+              const py = Math.min(Math.floor(y * sampleY), image.height - 1);
+              const idx = (py * image.width + px) * 4;
+              const r = image.bitmap.data[idx];
+              const g = image.bitmap.data[idx + 1];
+              const b = image.bitmap.data[idx + 2];
+              const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+              const charIndex = Math.min(Math.floor(brightness * chars.length), chars.length - 1);
+              ascii += chars[charIndex];
+            }
+            ascii += '\n';
+          }
+
+          const cardName = product.name || `Product ${args.productId}`;
+          const header = `\n${cardName}\n${'═'.repeat(width)}\n`;
+          return { content: [{ type: 'text', text: header + ascii }] };
+        } catch (err) {
+          return { content: [{ type: 'text', text: `Error: ${(err as Error).message}` }], isError: true };
+        }
       }
 
       case 'tcgplayer_free_shipping_threshold': {

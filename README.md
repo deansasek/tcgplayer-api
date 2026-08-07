@@ -201,6 +201,7 @@ Claude Code automatically detects `.mcp.json`:
 | `tcgplayer_trending_articles` | Trending articles |
 | `tcgplayer_infinite_product` | Simplified product data |
 | `tcgplayer_normalize_card_name` | Normalize card name |
+| `tcgplayer_render_card` | Render a card as ASCII art |
 
 ### MCP Usage Examples
 
@@ -213,6 +214,9 @@ Claude uses: tcgplayer_latest_sales with productId=704874
 
 User: What conditions are available for Pokemon?
 Claude uses: tcgplayer_category_filters with categoryId="3"
+
+User: Show me Charizard as ASCII art
+Claude uses: tcgplayer_render_card with productId=546343
 ```
 
 ---
