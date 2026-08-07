@@ -31,6 +31,8 @@ import {
   getCountryCodes,
   getArticles,
   getTrendingArticles,
+  getInfiniteProduct,
+  normalizeCardName,
   getProduct,
 } from '../server.js';
 
@@ -310,6 +312,28 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
           },
         },
       },
+      {
+        name: 'tcgplayer_infinite_product',
+        description: 'Get simplified product data from infinite-api',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            productId: { type: 'number', description: 'TCGplayer product ID' },
+          },
+          required: ['productId'],
+        },
+      },
+      {
+        name: 'tcgplayer_normalize_card_name',
+        description: 'Normalize a card name for consistent lookup',
+        inputSchema: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Card name to normalize' },
+          },
+          required: ['name'],
+        },
+      },
     ],
   };
 });
@@ -470,6 +494,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const results = await getTrendingArticles({
           limit: args.limit || 10,
         });
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_infinite_product': {
+        const results = await getInfiniteProduct(args.productId);
+        return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
+      }
+
+      case 'tcgplayer_normalize_card_name': {
+        const results = await normalizeCardName(args.name);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 

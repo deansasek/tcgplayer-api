@@ -644,6 +644,40 @@ export async function getTrendingArticles(options = {}) {
 }
 
 /**
+ * Get simplified product data from infinite-api
+ * @param {number|string} productId - TCGplayer product ID
+ * @returns {Promise<Object>} - Simplified product data
+ */
+export async function getInfiniteProduct(productId) {
+  const response = await fetch(`${BASE_URLS['infinite-api']}/product/${productId}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Infinite product failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
+ * Normalize a card name for consistent lookup
+ * @param {string} name - Card name to normalize
+ * @returns {Promise<Object>} - Normalized name
+ */
+export async function normalizeCardName(name) {
+  const response = await fetch(`${BASE_URLS['infinite-api']}/card/normalize/${encodeURIComponent(name)}`, {
+    headers: DEFAULT_HEADERS,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Normalize card name failed: ${response.status} ${response.statusText}`);
+  }
+
+  return response.json();
+}
+
+/**
  * Search products with full details (convenience function)
  * @param {string} query - Search query
  * @param {Object} options - Options
@@ -694,6 +728,8 @@ export default {
   getCountryCodes,
   getArticles,
   getTrendingArticles,
+  getInfiniteProduct,
+  normalizeCardName,
   searchProducts,
   getProduct,
 };

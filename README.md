@@ -271,6 +271,23 @@ Get trending articles.
 const trending = await getTrendingArticles({ limit: 10 });
 ```
 
+### getInfiniteProduct(productId)
+
+Get simplified product data from infinite-api.
+
+```javascript
+const product = await getInfiniteProduct(704874);
+```
+
+### normalizeCardName(name)
+
+Normalize a card name for consistent lookup.
+
+```javascript
+const normalized = await normalizeCardName('Morpeko ex');
+// Returns: { normalized: 'morpeko_ex' }
+```
+
 ## Product Line Options
 
 ```javascript
@@ -308,6 +325,8 @@ autocomplete('gundam', { productLine: 'Gundam Card Game' });
 | `getCountryCodes` | `https://mpapi.tcgplayer.com/v2/address/countryCodes` | GET |
 | `getArticles` | `https://infinite-api.tcgplayer.com/c/articles/` | GET |
 | `getTrendingArticles` | `https://infinite-api.tcgplayer.com/content/articles/trending/` | GET |
+| `getInfiniteProduct` | `https://infinite-api.tcgplayer.com/product/{id}` | GET |
+| `normalizeCardName` | `https://infinite-api.tcgplayer.com/card/normalize/{name}` | GET |
 
 ## MCP Server (Claude Code Integration)
 
@@ -358,6 +377,8 @@ Claude Code will automatically detect and use MCP servers defined in `.mcp.json`
 | `tcgplayer_country_codes` | Get available country codes for shipping |
 | `tcgplayer_articles` | Get articles for a vertical |
 | `tcgplayer_trending_articles` | Get trending articles |
+| `tcgplayer_infinite_product` | Get simplified product data from infinite-api |
+| `tcgplayer_normalize_card_name` | Normalize a card name for consistent lookup |
 
 ### Usage Examples
 
