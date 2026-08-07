@@ -548,7 +548,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
           const sampleX = image.width / width;
           const sampleY = image.height / scaledHeight;
 
-          const chars = ' .:-=+*#%@';
+          const chars = ' ░▒▓█';
           let ascii = '';
 
           for (let y = 0; y < scaledHeight; y++) {
