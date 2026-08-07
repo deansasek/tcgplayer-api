@@ -9,6 +9,7 @@
     ".": "./server.js"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@playwright/test": "^1.62.1"
   }
 }
