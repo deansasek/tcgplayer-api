@@ -157,20 +157,15 @@ The MCP server enables Claude Code to interact with TCGplayer data directly.
 
 ### Installation
 
-The MCP package is published separately:
-
-```bash
-npm install @deansasek/tcgplayer-api-mcp
-```
-
 Claude Code automatically detects `.mcp.json`:
 
 ```json
 {
   "mcpServers": {
     "tcgplayer-api-mcp": {
-      "command": "npx",
-      "args": ["@deansasek/tcgplayer-api-mcp"]
+      "command": "node",
+      "args": ["dist/mcp/server.js"],
+      "cwd": "/Users/deansasek/Documents/Projects/tcgplayer"
     }
   }
 }

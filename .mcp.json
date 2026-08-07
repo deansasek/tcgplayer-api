@@ -1,8 +1,9 @@
 {
   "mcpServers": {
     "tcgplayer-api-mcp": {
-      "command": "npx",
-      "args": ["@deansasek/tcgplayer-api-mcp"]
+      "command": "node",
+      "args": ["dist/mcp/server.js"],
+      "cwd": "/Users/deansasek/Documents/Projects/tcgplayer"
     }
   }
 }
