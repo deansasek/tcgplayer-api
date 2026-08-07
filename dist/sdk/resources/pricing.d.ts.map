@@ -1,0 +1,1 @@
+{"version":3,"file":"pricing.d.ts","sourceRoot":"","sources":["../../../sdk/resources/pricing.ts"],"names":[],"mappings":"AAAA;;GAEG;AAGH,OAAO,EAAE,oBAAoB,EAAE,MAAM,aAAa,CAAC;AAiCnD,qBAAa,eAAe;IACpB,eAAe,CAAC,MAAM,EAAE,MAAM,EAAE,EAAE,KAAK,SAAgB,GAAG,OAAO,CAAC,oBAAoB,EAAE,CAAC;CAchG"}

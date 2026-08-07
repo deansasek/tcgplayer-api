@@ -342,65 +342,65 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
  * Handle tool calls
  */
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
-  const { name, arguments: args } = request.params;
+  const { name, arguments: args = {} } = request.params;
 
   try {
     switch (name) {
       case 'tcgplayer_autocomplete': {
-        const results = await autocomplete(args.query, {
-          productLine: args.productLine || 'Pokemon',
+        const results = await autocomplete(args.query as string, {
+          productLine: (args.productLine as string) || 'Pokemon',
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_search': {
         const results = await search({
-          q: args.q || '',
-          productLine: args.productLine || 'Pokemon',
-          from: args.from || 0,
-          size: args.size || 24,
+          q: (args.q as string) || '',
+          productLine: (args.productLine as string) || 'Pokemon',
+          from: (args.from as number) || 0,
+          size: (args.size as number) || 24,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_product': {
-        const results = await getProduct(args.productId);
+        const results = await getProduct(args.productId as number);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_product_details': {
-        const results = await getProductDetails(args.productId);
+        const results = await getProductDetails(args.productId as number);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_latest_sales': {
-        const results = await getLatestSales(args.productId, {
-          conditions: args.conditions || [],
-          languages: args.languages || [1],
-          limit: args.limit || 25,
+        const results = await getLatestSales(args.productId as number, {
+          conditions: (args.conditions as (number | string)[]) || [],
+          languages: (args.languages as (number | string)[]) || [1],
+          limit: (args.limit as number) || 25,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_price_history': {
-        const results = await getPriceHistory(args.productId, {
-          range: args.range || 'quarter',
+        const results = await getPriceHistory(args.productId as number, {
+          range: (args.range as string) || 'quarter',
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_volatility': {
-        const results = await getVolatility(args.skuId);
+        const results = await getVolatility(args.skuId as number);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_buylist_price': {
-        const results = await getBuylistPrice(args.productId);
+        const results = await getBuylistPrice(args.productId as number);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_category_filters': {
-        const results = await getCategoryFilters(args.categoryId || '3');
+        const results = await getCategoryFilters((args.categoryId as string) || '3');
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
@@ -410,28 +410,28 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'tcgplayer_latest_sets': {
-        const results = await getLatestSets(args.productLineIds);
+        const results = await getLatestSets(args.productLineIds as string);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_product_listings': {
-        const results = await getProductListings(args.productId, {
-          sellerStatus: args.sellerStatus || 'Live',
-          languages: args.languages || ['English'],
-          conditions: args.conditions || [],
-          quantityGte: args.quantityGte || 1,
+        const results = await getProductListings(args.productId as number, {
+          sellerStatus: (args.sellerStatus as string) || 'Live',
+          languages: (args.languages as string[]) || ['English'],
+          conditions: (args.conditions as string[]) || [],
+          quantityGte: (args.quantityGte as number) || 1,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_set_name': {
-        const results = await getSetName(args.setId);
+        const results = await getSetName(args.setId as number);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_recommendations': {
-        const results = await getFacetedRecommendations(args.productIds, {
-          limit: args.limit || 10,
+        const results = await getFacetedRecommendations(args.productIds as number[], {
+          limit: (args.limit as number) || 10,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
@@ -442,7 +442,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       }
 
       case 'tcgplayer_tags': {
-        const results = await getTags(args.domains || 'marketplace', args.classifications || 'product line affinity');
+        const results = await getTags((args.domains as string) || 'marketplace', (args.classifications as string) || 'product line affinity');
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
@@ -453,16 +453,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'tcgplayer_bestsellers': {
         const results = await getBestsellers({
-          categoryId: args.categoryId || '3',
-          limit: args.limit || 20,
+          categoryId: (args.categoryId as string) || '3',
+          limit: (args.limit as number) || 20,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_trending': {
         const results = await getTrending({
-          productLine: args.productLine || 'Pokemon',
-          limit: args.limit || 10,
+          productLine: (args.productLine as string) || 'Pokemon',
+          limit: (args.limit as number) || 10,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
@@ -484,26 +484,26 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
       case 'tcgplayer_articles': {
         const results = await getArticles({
-          vertical: args.vertical || 'pokemon',
-          limit: args.limit || 10,
+          vertical: (args.vertical as string) || 'pokemon',
+          limit: (args.limit as number) || 10,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_trending_articles': {
         const results = await getTrendingArticles({
-          limit: args.limit || 10,
+          limit: (args.limit as number) || 10,
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_infinite_product': {
-        const results = await getInfiniteProduct(args.productId);
+        const results = await getInfiniteProduct(args.productId as number);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
       case 'tcgplayer_normalize_card_name': {
-        const results = await normalizeCardName(args.name);
+        const results = await normalizeCardName(args.name as string);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
@@ -511,7 +511,7 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: 'text', text: `Unknown tool: ${name}` }], isError: true };
     }
   } catch (error) {
-    return { content: [{ type: 'text', text: `Error: ${error.message}` }], isError: true };
+    return { content: [{ type: 'text', text: `Error: ${(error as Error).message}` }], isError: true };
   }
 });
 
