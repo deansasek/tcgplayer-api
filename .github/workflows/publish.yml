@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   publish:
@@ -31,7 +32,7 @@ jobs:
 
       - name: Set SDK version
         run: |
-          VERSION="0.0.${{ github.run_id }}"
+          VERSION="1.0.${{ github.run_number }}"
           npm pkg set version=$VERSION
 
       - name: Publish SDK

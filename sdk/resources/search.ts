@@ -1,5 +1,7 @@
 /**
  * Search Resource
+ *
+ * Handles product search, autocomplete, bestsellers, and trending suggestions.
  */
 
 import { TCGplayerError, ValidationError } from '../errors.js';
@@ -45,7 +47,18 @@ async function postRequest<T>(url: string, body: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/**
+ * Search methods for autocomplete, full-text search, bestsellers, and trending.
+ */
 export class SearchResource {
+  /**
+   * Search for products by name (autocomplete).
+   * Returns a list of matching products with basic info.
+   *
+   * @param query - Search query string
+   * @param options.productLine - Filter by product line (default: "Pokemon")
+   * @param options.sessionId - Session ID for tracking (auto-generated if not provided)
+   */
   async autocomplete(query: string, options: { productLine?: string; sessionId?: string } = {}): Promise<AutocompleteProduct[]> {
     if (typeof query !== 'string' || query.trim() === '') {
       throw new ValidationError('query', 'must be a non-empty string');
@@ -64,6 +77,15 @@ export class SearchResource {
     return data.products || [];
   }
 
+  /**
+   * Full search with filters, sorting, and pagination.
+   *
+   * @param options - Search options
+   * @param options.q - Search query (default: "")
+   * @param options.productLine - Filter by product line (default: "Pokemon")
+   * @param options.from - Offset for pagination (default: 0)
+   * @param options.size - Results per page (default: 24)
+   */
   async fullSearch(options: SearchOptions = {}): Promise<unknown> {
     const {
       q = '',
@@ -112,6 +134,12 @@ export class SearchResource {
     return postRequest(url, body);
   }
 
+  /**
+   * Get best-selling products for a category.
+   *
+   * @param options.categoryId - Category ID (default: "3" for Pokemon)
+   * @param options.limit - Number of results (default: 20)
+   */
   async bestsellers(options: { categoryId?: string; limit?: number } = {}): Promise<unknown> {
     const { categoryId = '3', limit = 20 } = options;
     const params = new URLSearchParams({ categoryId, limit: String(limit) });
@@ -119,6 +147,12 @@ export class SearchResource {
     return request(url);
   }
 
+  /**
+   * Get trending product suggestions.
+   *
+   * @param options.productLine - Product line to get trending for (default: "Pokemon")
+   * @param options.limit - Number of suggestions (default: 10)
+   */
   async trending(options: { productLine?: string; limit?: number } = {}): Promise<{ products?: TrendingSuggestion[] }> {
     const { productLine = 'Pokemon', limit = 10 } = options;
     const url = `${BASE_URLS.data}/suggestions/trending`;

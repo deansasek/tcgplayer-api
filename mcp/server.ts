@@ -8,7 +8,10 @@ import {
 import { TCGplayerClient } from '../sdk/client.js';
 
 /**
- * Create the MCP server
+ * TCGplayer MCP Server
+ *
+ * Provides Claude Code tools for searching TCGplayer products, fetching prices,
+ * sales data, and rendering card images as ASCII art.
  */
 const server = new Server(
   {
@@ -22,14 +25,8 @@ const server = new Server(
   }
 );
 
-/**
- * Initialize the SDK client
- */
+/** SDK client shared across all tool calls */
 const client = new TCGplayerClient();
-
-/**
- * List available tools
- */
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [

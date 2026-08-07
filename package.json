@@ -1,6 +1,6 @@
 {
   "name": "@deansasek/tcgplayer-api",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "description": "SDK, REST API wrapper, and MCP server for TCGplayer",
   "author": "https://github.com/deansasek",
   "type": "module",

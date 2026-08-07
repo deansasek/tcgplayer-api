@@ -1,5 +1,7 @@
 /**
  * Pricing Resource
+ *
+ * Handles market price data, SKU pricing, and volatility metrics.
  */
 
 import { TCGplayerError, ValidationError } from '../errors.js';
@@ -36,6 +38,16 @@ async function postRequest<T>(url: string, body: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/**
+ * Get market prices for multiple SKUs at once.
+ *
+ * @param skuIds - Array of TCGplayer SKU IDs (max batch size varies)
+ * @param mpfev - Protocol version (default: 5429)
+ * @returns Array of market price records for each SKU
+ *
+ * @example
+ * const prices = await client.pricing.skuMarketPrices([12345, 67890]);
+ */
 export class PricingResource {
   async skuMarketPrices(skuIds: number[], mpfev = DEFAULT_MPFEV): Promise<SkuMarketPriceRecord[]> {
     if (!Array.isArray(skuIds) || skuIds.length === 0) {

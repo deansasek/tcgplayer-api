@@ -1,5 +1,7 @@
 /**
  * Products Resource
+ *
+ * Handles product details, listings, sales, pricing history, and recommendations.
  */
 
 import { TCGplayerError, ValidationError } from '../errors.js';
@@ -53,7 +55,17 @@ async function postRequest<T>(url: string, body: unknown): Promise<T> {
   return response.json() as Promise<T>;
 }
 
+/**
+ * Product methods for details, listings, sales, and pricing data.
+ */
 export class ProductsResource {
+  /**
+   * Get detailed product information including market price, rarity, and SKU data.
+   *
+   * @param productId - TCGplayer product ID
+   * @example
+   * const product = await client.products.details(704874);
+   */
   async details(productId: number | string): Promise<ProductDetails> {
     assertPositiveNumber(Number(productId), 'productId');
     const mpfev = DEFAULT_MPFEV;
@@ -61,6 +73,12 @@ export class ProductsResource {
     return request<ProductDetails>(url);
   }
 
+  /**
+   * Get detailed seller listings for a product.
+   *
+   * @param productId - TCGplayer product ID
+   * @param options - Filter options (sellerStatus, languages, conditions, quantity)
+   */
   async listings(productId: number | string, options: ProductListingsOptions = {}): Promise<ProductListingsResponse> {
     assertPositiveNumber(Number(productId), 'productId');
     const {
@@ -87,6 +105,12 @@ export class ProductsResource {
     return postRequest<ProductListingsResponse>(url, body);
   }
 
+  /**
+   * Get recent sales data for a product.
+   *
+   * @param productId - TCGplayer product ID
+   * @param options - Filter by condition, language, variant; set limit
+   */
   async sales(productId: number | string, options: LatestSalesOptions = {}): Promise<LatestSalesResponse> {
     assertPositiveNumber(Number(productId), 'productId');
     const {
@@ -102,6 +126,12 @@ export class ProductsResource {
     return postRequest<LatestSalesResponse>(url, { conditions, languages, variants, listingType, limit });
   }
 
+  /**
+   * Get historical pricing data for a product.
+   *
+   * @param productId - TCGplayer product ID
+   * @param options.range - Time range: week, month, quarter, or year (default: quarter)
+   */
   async priceHistory(productId: number | string, options: PriceHistoryOptions = {}): Promise<PriceHistoryResponse> {
     assertPositiveNumber(Number(productId), 'productId');
     const { range = 'quarter' } = options;
@@ -117,24 +147,46 @@ export class ProductsResource {
     });
   }
 
+  /**
+   * Get market volatility for a specific SKU.
+   *
+   * @param skuId - TCGplayer SKU ID
+   */
   async volatility(skuId: number | string, mpfev = DEFAULT_MPFEV): Promise<VolatilityResponse> {
     assertPositiveNumber(Number(skuId), 'skuId');
     const url = `${BASE_URLS.mpgateway}/v1/pricepoints/marketprice/skus/${skuId}/volatility?mpfev=${mpfev}`;
     return request<VolatilityResponse>(url);
   }
 
+  /**
+   * Get buylist/market prices for a product.
+   *
+   * @param productId - TCGplayer product ID
+   */
   async buylistPrice(productId: number | string, mpfev = DEFAULT_MPFEV): Promise<BuylistPriceRecord[]> {
     assertPositiveNumber(Number(productId), 'productId');
     const url = `${BASE_URLS.mpgateway}/v1/pricepoints/buylist/marketprice/products/${productId}?mpfev=${mpfev}`;
     return request<BuylistPriceRecord[]>(url);
   }
 
+  /**
+   * Get simplified product data from the infinite-api.
+   * Includes image URL, market price, and basic product info.
+   *
+   * @param productId - TCGplayer product ID
+   */
   async infinite(productId: number | string): Promise<InfiniteProduct> {
     assertPositiveNumber(Number(productId), 'productId');
     const url = `${BASE_URLS['infinite-api']}/product/${productId}`;
     return request<InfiniteProduct>(url);
   }
 
+  /**
+   * Get faceted product recommendations based on a list of product IDs.
+   *
+   * @param productIds - Array of product IDs to base recommendations on
+   * @param options.limit - Max recommendations to return (default: 10)
+   */
   async recommendations(productIds: number[], options: { limit?: number } = {}): Promise<unknown> {
     if (!Array.isArray(productIds) || productIds.length === 0) {
       throw new ValidationError('productIds', 'must be a non-empty array');
