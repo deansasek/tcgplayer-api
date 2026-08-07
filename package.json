@@ -1,13 +1,16 @@
 {
-  "name": "tcgplayer-api",
+  "name": "@deansasek/tcgplayer-api",
   "version": "1.0.0",
-  "description": "REST API wrapper for TCGplayer",
+  "description": "SDK, REST API wrapper, and MCP server for TCGplayer",
   "author": "https://github.com/deansasek",
   "type": "module",
   "main": "dist/server.js",
   "exports": {
     ".": "./dist/server.js",
     "./sdk": "./dist/sdk/index.js"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com"
   },
   "scripts": {
     "build": "tsc",

@@ -7,8 +7,7 @@ An SDK and REST API wrapper for [TCGplayer](https://www.tcgplayer.com/) providin
 ## Installation
 
 ```bash
-npm install
-npm run build
+npm install @deansasek/tcgplayer-api
 ```
 
 ## SDK
@@ -16,7 +15,7 @@ npm run build
 The SDK provides a typed, class-based interface organized by resource.
 
 ```typescript
-import { TCGplayerClient } from 'tcgplayer-api/sdk';
+import { TCGplayerClient } from '@deansasek/tcgplayer-api/sdk';
 
 const client = new TCGplayerClient();
 
@@ -43,7 +42,7 @@ const history = await client.products.priceHistory(704874, { range: 'quarter' })
 ### SDK Example: Card Analysis
 
 ```typescript
-import { TCGplayerClient } from 'tcgplayer-api/sdk';
+import { TCGplayerClient } from '@deansasek/tcgplayer-api/sdk';
 
 const client = new TCGplayerClient();
 
@@ -76,7 +75,7 @@ analyzeCard(704874); // Morpeko ex
 Flat function exports for direct API access.
 
 ```typescript
-import { autocomplete, getProduct } from 'tcgplayer-api';
+import { autocomplete, getProduct } from '@deansasek/tcgplayer-api';
 ```
 
 ### autocomplete(query, options?)
