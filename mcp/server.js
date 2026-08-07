@@ -43,7 +43,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'tcg_autocomplete',
+        name: 'tcgplayer_autocomplete',
         description: 'Search for TCGplayer products by name',
         inputSchema: {
           type: 'object',
@@ -55,7 +55,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_search',
+        name: 'tcgplayer_search',
         description: 'Search TCGplayer products with filters and pagination',
         inputSchema: {
           type: 'object',
@@ -68,7 +68,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_product',
+        name: 'tcgplayer_product',
         description: 'Get full product data including details, sales, and price history',
         inputSchema: {
           type: 'object',
@@ -79,7 +79,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_product_details',
+        name: 'tcgplayer_product_details',
         description: 'Get detailed product information',
         inputSchema: {
           type: 'object',
@@ -90,7 +90,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_latest_sales',
+        name: 'tcgplayer_latest_sales',
         description: 'Get recent sales data for a product',
         inputSchema: {
           type: 'object',
@@ -104,7 +104,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_price_history',
+        name: 'tcgplayer_price_history',
         description: 'Get historical pricing data',
         inputSchema: {
           type: 'object',
@@ -116,7 +116,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_volatility',
+        name: 'tcgplayer_volatility',
         description: 'Get market volatility for a SKU',
         inputSchema: {
           type: 'object',
@@ -127,7 +127,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_buylist_price',
+        name: 'tcgplayer_buylist_price',
         description: 'Get buylist/market prices for a product',
         inputSchema: {
           type: 'object',
@@ -138,7 +138,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_category_filters',
+        name: 'tcgplayer_category_filters',
         description: 'Get available filter options (conditions, languages, variants) for a category',
         inputSchema: {
           type: 'object',
@@ -148,7 +148,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_product_lines',
+        name: 'tcgplayer_product_lines',
         description: 'Get all available product lines',
         inputSchema: {
           type: 'object',
@@ -156,7 +156,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         },
       },
       {
-        name: 'tcg_latest_sets',
+        name: 'tcgplayer_latest_sets',
         description: 'Get latest sets for product lines',
         inputSchema: {
           type: 'object',
@@ -177,14 +177,14 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
 
   try {
     switch (name) {
-      case 'tcg_autocomplete': {
+      case 'tcgplayer_autocomplete': {
         const results = await autocomplete(args.query, {
           productLine: args.productLine || 'Pokemon',
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_search': {
+      case 'tcgplayer_search': {
         const results = await search({
           q: args.q || '',
           productLine: args.productLine || 'Pokemon',
@@ -194,17 +194,17 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_product': {
+      case 'tcgplayer_product': {
         const results = await getProduct(args.productId);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_product_details': {
+      case 'tcgplayer_product_details': {
         const results = await getProductDetails(args.productId);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_latest_sales': {
+      case 'tcgplayer_latest_sales': {
         const results = await getLatestSales(args.productId, {
           conditions: args.conditions || [],
           languages: args.languages || [1],
@@ -213,34 +213,34 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_price_history': {
+      case 'tcgplayer_price_history': {
         const results = await getPriceHistory(args.productId, {
           range: args.range || 'quarter',
         });
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_volatility': {
+      case 'tcgplayer_volatility': {
         const results = await getVolatility(args.skuId);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_buylist_price': {
+      case 'tcgplayer_buylist_price': {
         const results = await getBuylistPrice(args.productId);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_category_filters': {
+      case 'tcgplayer_category_filters': {
         const results = await getCategoryFilters(args.categoryId || '3');
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_product_lines': {
+      case 'tcgplayer_product_lines': {
         const results = await getProductLines();
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }
 
-      case 'tcg_latest_sets': {
+      case 'tcgplayer_latest_sets': {
         const results = await getLatestSets(args.productLineIds);
         return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] };
       }

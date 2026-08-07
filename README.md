@@ -206,29 +206,29 @@ Claude Code will automatically detect and use MCP servers defined in `.mcp.json`
 
 | Tool | Description |
 |------|-------------|
-| `tcg_autocomplete` | Search for TCGplayer products by name |
-| `tcg_search` | Search products with filters and pagination |
-| `tcg_product` | Get full product data (details, sales, price history) |
-| `tcg_product_details` | Get detailed product information |
-| `tcg_latest_sales` | Get recent sales data for a product |
-| `tcg_price_history` | Get historical pricing data |
-| `tcg_volatility` | Get market volatility for a SKU |
-| `tcg_buylist_price` | Get buylist/market prices for a product |
-| `tcg_category_filters` | Get available filter options (conditions, languages, variants) |
-| `tcg_product_lines` | Get all available product lines |
-| `tcg_latest_sets` | Get latest sets for product lines |
+| `tcgplayer_autocomplete` | Search for TCGplayer products by name |
+| `tcgplayer_search` | Search products with filters and pagination |
+| `tcgplayer_product` | Get full product data (details, sales, price history) |
+| `tcgplayer_product_details` | Get detailed product information |
+| `tcgplayer_latest_sales` | Get recent sales data for a product |
+| `tcgplayer_price_history` | Get historical pricing data |
+| `tcgplayer_volatility` | Get market volatility for a SKU |
+| `tcgplayer_buylist_price` | Get buylist/market prices for a product |
+| `tcgplayer_category_filters` | Get available filter options (conditions, languages, variants) |
+| `tcgplayer_product_lines` | Get all available product lines |
+| `tcgplayer_latest_sets` | Get latest sets for product lines |
 
 ### Usage Examples
 
 ```
 User: Search for Morpeko cards on TCGplayer
-Claude uses: tcg_search with q="morpeko"
+Claude uses: tcgplayer_search with q="morpeko"
 
 User: Get the latest sales for product 704874
-Claude uses: tcg_latest_sales with productId=704874
+Claude uses: tcgplayer_latest_sales with productId=704874
 
 User: What conditions and languages are available for Pokemon?
-Claude uses: tcg_category_filters with categoryId="3"
+Claude uses: tcgplayer_category_filters with categoryId="3"
 ```
 
 ## Examples
